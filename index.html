@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Mural de Aniversariantes 🎉</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@500&display=swap');
+
+body {
+  font-family: 'Baloo 2', cursive;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background: linear-gradient(135deg, #ffe0f0, #e0f7ff);
+  position: relative;
+}
+
+h1 {
+  text-align: center;
+  color: #333;
+  font-size: 2.5em;
+  margin: 20px 0;
+  text-shadow: 1px 1px 3px #aaa;
+}
+
+#controle {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+select, button {
+  padding: 10px 14px;
+  margin: 5px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  outline: none;
+  transition: all 0.3s;
+}
+
+select:hover, button:hover { transform: scale(1.05); }
+
+button {
+  background: linear-gradient(to right, #ff69b4, #ffb6c1);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+#lista {
+  max-width: 1000px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 20px;
+  position: relative;
+  z-index: 2;
+}
+
+.card {
+  border-radius: 16px;
+  padding: 20px;
+  color: #333;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  text-align: center;
+  background: rgba(255,255,255,0.95);
+  transition: transform 0.3s, filter 0.3s, box-shadow 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+
+.card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 15px 30px rgba(0,0,0,0.25);
+  filter: brightness(1.1);
+}
+
+.card input.nomeInput {
+  width: 90%;
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  margin-bottom: 10px;
+  text-align: center;
+  font-weight: bold;
+}
+
+.card input.nomeInput:focus {
+  border-color: #FF69B4;
+  outline: none;
+}
+
+.card span.dataNascimento {
+  display: block;
+  font-weight: bold;
+  margin-top: 5px;
+  padding: 6px 0;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background: rgba(255,255,255,0.8);
+  width: 120px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.current-month {
+  border: 3px solid gold;
+  box-shadow: 0 0 25px gold, 0 0 50px rgba(255,215,0,0.6);
+  background: linear-gradient(145deg, #fff0b3, #ffe066);
+  animation: glow 2s infinite alternate;
+}
+
+@keyframes glow {
+  from { box-shadow: 0 0 25px gold, 0 0 50px rgba(255,215,0,0.6);}
+  to { box-shadow: 0 0 40px gold, 0 0 80px rgba(255,215,0,0.8);}
+}
+
+.cake {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 2em;
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0%,100% { transform: scale(1); }
+  50% { transform: scale(1.3); }
+}
+
+.not-current {
+  background: #e0e0e0 !important;
+}
+
+.balloon, .confetti, .firework, .special-confetti, .firework-large {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.9;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.firework {
+  width: 8px;
+  height: 8px;
+  opacity: 0.7;
+}
+
+.special-confetti {
+  opacity: 1;
+  z-index: 3;
+}
+
+.firework-large {
+  width: 12px;
+  height: 12px;
+  opacity: 0.9;
+  z-index: 3;
+}
+</style>
+</head>
+<body>
+
+<h1>Mural de Aniversariantes 🎉</h1>
+
+<div id="controle">
+  <select id="mesFiltro">
+    <option value="0">Todos os meses</option>
+    <option value="1">Janeiro</option>
+    <option value="2">Fevereiro</option>
+    <option value="3">Março</option>
+    <option value="4">Abril</option>
+    <option value="5">Maio</option>
+    <option value="6">Junho</option>
+    <option value="7">Julho</option>
+    <option value="8">Agosto</option>
+    <option value="9">Setembro</option>
+    <option value="10">Outubro</option>
+    <option value="11">Novembro</option>
+    <option value="12">Dezembro</option>
+  </select>
+  <button onclick="aplicarFiltro()">Filtrar</button>
+</div>
+
+<div id="lista"></div>
+
+<script>
+let jsonData = [
+  { "Digite seu nome": "Taynara", "Qual a sua data de nascimento": "2010-02-26" },
+  { "Digite seu nome": "Rafael", "Qual a sua data de nascimento": "2009-02-05" },
+  { "Digite seu nome": "Arthur", "Qual a sua data de nascimento": "2009-07-23" },
+  { "Digite seu nome": "Giovana", "Qual a sua data de nascimento": "2009-12-14" },
+  { "Digite seu nome": "Gabrielle", "Qual a sua data de nascimento": "2008-10-07" },
+  { "Digite seu nome": "Davi Filipe", "Qual a sua data de nascimento": "2009-12-24" },
+  { "Digite seu nome": "Kaiky", "Qual a sua data de nascimento": "2010-03-22" },
+  { "Digite seu nome": "Gualber", "Qual a sua data de nascimento": "2009-10-12" },
+  { "Digite seu nome": "Thauany", "Qual a sua data de nascimento": "2009-09-19" },
+  { "Digite seu nome": "Emily", "Qual a sua data de nascimento": "2009-09-21" },
+  { "Digite seu nome": "Camilly", "Qual a sua data de nascimento": "2009-09-28" },
+  { "Digite seu nome": "Miquéias", "Qual a sua data de nascimento": "2009-11-15" },
+  { "Digite seu nome": "Emanuelly", "Qual a sua data de nascimento": "2009-03-31" },
+  { "Digite seu nome": "Sthefany", "Qual a sua data de nascimento": "2009-06-19" },
+  { "Digite seu nome": "Ana", "Qual a sua data de nascimento": "2010-04-07" },
+  { "Digite seu nome": "William", "Qual a sua data de nascimento": "2010-05-19" },
+  { "Digite seu nome": "Luiz", "Qual a sua data de nascimento": "2010-05-14" },
+  { "Digite seu nome": "Carol", "Qual a sua data de nascimento": "1982-02-21" }
+];
+
+let filteredData = [];
+const cores=['#FFB6C1','#FFD700','#90EE90','#87CEFA','#FFA07A','#DA70D6','#00CED1','#FF69B4','#BA55D3','#20B2AA','#FF8C00','#7B68EE'];
+
+function parseDate(str){
+  const parts = str.split('-'); 
+  return new Date(parts[0], parts[1]-1, parts[2]);
+}
+
+function formatDate(date){ return date.toLocaleDateString('pt-BR'); }
+function capitalizeName(name){ let n=name.split(" "); if(n.length>2)n=n.slice(0,2); return n.map(w=>w.charAt(0).toUpperCase()+w.slice(1).toLowerCase()).join(" "); }
+
+function mostrarAniversariantes(){
+  const div=document.getElementById("lista");
+  if(filteredData.length===0){ div.innerHTML="<p style='text-align:center;padding:10px'>Nenhum aniversariante encontrado.</p>"; return; }
+  const mesAtual=new Date().getMonth()+1;
+  filteredData.sort((a,b)=>{ const da=parseDate(a["Qual a sua data de nascimento"]); const db=parseDate(b["Qual a sua data de nascimento"]); return da.getMonth()-db.getMonth() || da.getDate()-db.getDate(); });
+  let html="";
+  filteredData.forEach((item,index)=>{
+    item["Digite seu nome"]=capitalizeName(item["Digite seu nome"]);
+    const dateObj=parseDate(item["Qual a sua data de nascimento"]);
+    const itemMes=dateObj.getMonth()+1;
+    const destaque=itemMes===mesAtual?"current-month":"not-current";
+    html+=`<div class="card ${destaque}" data-index="${index}">
+      ${itemMes===mesAtual?'<div class="cake">🎂</div>':''}
+      <input class="nomeInput" value="${item["Digite seu nome"]}" onchange="editarNome(${index}, this.value)">
+      <span class="dataNascimento">${formatDate(dateObj)}</span>
+    </div>`;
+  });
+  div.innerHTML=html;
+
+  document.querySelectorAll('.current-month').forEach(card=>{
+    for(let i=0;i<5;i++){ criarSpecialConfetti(card); }
+    for(let i=0;i<3;i++){ criarFirework(card); }
+  });
+}
+
+function editarNome(index, valor){
+  filteredData[index]["Digite seu nome"]=capitalizeName(valor);
+  const orig=jsonData.findIndex(d=>d["Qual a sua data de nascimento"]===filteredData[index]["Qual a sua data de nascimento"]);
+  if(orig>=0) jsonData[orig]["Digite seu nome"]=capitalizeName(valor);
+}
+
+function aplicarFiltro(){
+  const mes=parseInt(document.getElementById("mesFiltro").value);
+  filteredData=jsonData.filter(item=>{
+    const d=parseDate(item["Qual a sua data de nascimento"]);
+    const m=d.getMonth()+1;
+    return mes===0||m===mes;
+  });
+  mostrarAniversariantes();
+}
+
+aplicarFiltro();
+
+// Animações
+function criarDecoracao(){
+  const tipoRand=Math.random();
+  let tipo='confetti';
+  if(tipoRand<0.3) tipo='balloon';
+  else if(tipoRand<0.4) tipo='firework';
+  
+  const el=document.createElement('div');
+  el.className=tipo;
+  const size = tipo==='balloon'?15+Math.random()*15 : tipo==='firework'?6+Math.random()*6 : 5+Math.random()*5;
+  el.style.width=size+'px'; el.style.height=tipo==='balloon'?size*1.2+'px':size+'px';
+  el.style.backgroundColor=cores[Math.floor(Math.random()*cores.length)];
+  el.style.left=Math.random()*window.innerWidth+'px';
+  el.style.top='-20px';
+  document.body.appendChild(el);
+  let velY=0.5+Math.random()*2, velX=tipo==='confetti'?Math.random()*1-0.5:0, rot=Math.random()*360, rotSpeed=Math.random()*5-2.5;
+  function anim(){ let top=parseFloat(el.style.top)+velY; let left=parseFloat(el.style.left)+velX; rot+=rotSpeed; el.style.top=top+'px'; el.style.left=left+'px'; el.style.transform=`rotate(${rot}deg)`; if(top<window.innerHeight+50) requestAnimationFrame(anim); else el.remove(); }
+  anim();
+}
+
+function criarSpecialConfetti(card){
+  const el=document.createElement('div'); el.className='special-confetti';
+  const size=8+Math.random()*8; el.style.width=size+'px'; el.style.height=size+'px';
+  el.style.backgroundColor=cores[Math.floor(Math.random()*cores.length)];
+  const rect=card.getBoundingClientRect();
+  el.style.left=(rect.left + Math.random()*rect.width)+'px'; el.style.top=(rect.top + Math.random()*rect.height)+'px';
+  document.body.appendChild(el);
+  let velY=1+Math.random()*1.5, velX=Math.random()*1-0.5, rot=Math.random()*360, rotSpeed=Math.random()*5-2.5;
+  function anim(){ let top=parseFloat(el.style.top)+velY; let left=parseFloat(el.style.left)+velX; rot+=rotSpeed; el.style.top=top+'px'; el.style.left=left+'px'; el.style.transform=`rotate(${rot}deg)`; if(top<window.innerHeight+50) requestAnimationFrame(anim); else el.remove(); }
+  anim();
+}
+
+function criarFirework(card){
+  const el=document.createElement('div'); el.className='firework-large';
+  const size=12+Math.random()*8; el.style.width=size+'px'; el.style.height=size+'px';
+  el.style.backgroundColor=cores[Math.floor(Math.random()*cores.length)];
+  const rect=card.getBoundingClientRect();
+  el.style.left=(rect.left + rect.width/2)+'px'; el.style.top=(rect.top)+'px';
+  document.body.appendChild(el);
+  let velY= -5-Math.random()*2, velX=Math.random()*2-1, rot=Math.random()*360, rotSpeed=Math.random()*5-2.5, gravity=0.1;
+  function anim(){ velY+=gravity; let top=parseFloat(el.style.top)+velY; let left=parseFloat(el.style.left)+velX; rot+=rotSpeed; el.style.top=top+'px'; el.style.left=left+'px'; el.style.transform=`rotate(${rot}deg)`; if(top<window.innerHeight+50) requestAnimationFrame(anim); else el.remove(); }
+  anim();
+}
+
+setInterval(criarDecoracao,150);
+setInterval(()=>{
+  document.querySelectorAll('.current-month').forEach(card=>{
+    if(Math.random()<0.5) criarFirework(card);
+  });
+},1000);
+
+document.addEventListener('mousemove', e=>{
+  if(Math.random()>0.6) return;
+  const b=document.createElement('div'); b.className='balloon';
+  const size=10+Math.random()*15; b.style.width=size+'px'; b.style.height=size*1.2+'px';
+  b.style.left=e.clientX+'px'; b.style.top=e.clientY+'px';
+  b.style.backgroundColor=cores[Math.floor(Math.random()*cores.length)];
+  document.body.appendChild(b);
+  setTimeout(()=>b.remove(),3000);
+});
+</script>
+</body>
+</html>
